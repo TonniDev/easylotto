@@ -1,0 +1,34 @@
+model loterias {
+  id                             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  acumulado                      Boolean   @db.Boolean
+  dataApuracao                   String    @map(name: "data_apuracao") @db.VarChar(10)
+  dataProximoConcurso            String    @map(name: "data_proximo_concurso") @db.VarChar(10)
+  dezenasSorteadasOrdemSorteio   String[]  @map(name: "dezenas_sorteadas_ordem_sorteio") @db.Text
+  exibirDetalhamentoPorCidade    Boolean   @map(name: "exibir_detalhamento_por_cidade") @db.Boolean
+  indicadorConcursoEspecial      Int       @map(name: "indicador_concurso_especial") @db.Integer
+  listaDezenas                   String[]  @map(name: "lista_dezenas") @db.Text
+  listaDezenasSegundoSorteio     String[]  @map(name: "lista_dezenas_segundo_sorteio") @db.Text
+  localSorteio                   String    @map(name: "local_sorteio") @db.VarChar(255)
+  nomeMunicipioUFSorteio         String    @map(name: "nome_municipio_uf_sorteio") @db.VarChar(255)
+  nomeTimeCoracaoMesSorte        String    @map(name: "nome_time_coracao_mes_sorte") @db.VarChar(255)
+  numero                         Int       @db.Integer
+  numeroConcursoAnterior         Int       @map(name: "numero_concurso_anterior") @db.Integer
+  numeroConcursoFinal_0_5        Int       @map(name: "numero_concurso_final_0_5") @db.Integer
+  numeroConcursoProximo          Int       @map(name: "numero_concurso_proximo") @db.Integer
+  numeroJogo                     Int       @map(name: "numero_jogo") @db.Integer
+  observacao                     String    @db.Text
+  tipoJogo                       String    @map(name: "tipo_jogo") @db.VarChar(255)
+  tipoPublicacao                 Int       @map(name: "tipo_publicacao") @db.Integer
+  ultimoConcurso                 Boolean   @map(name: "ultimo_concurso") @db.Boolean
+  valorArrecadado                Decimal   @map(name: "valor_arrecadado") @db.Decimal(10, 2)
+  valorAcumuladoConcurso_0_5     Decimal   @map(name: "valor_acumulado_concurso_0_5") @db.Decimal(10, 2)
+  valorAcumuladoConcursoEspecial Decimal   @map(name: "valor_acumulado_concurso_especial") @db.Decimal(10, 2)
+  valorAcumuladoProximoConcurso  Decimal   @map(name: "valor_acumulado_proximo_concurso") @db.Decimal(10, 2)
+  valorEstimadoProximoConcurso   Decimal   @map(name: "valor_estimado_proximo_concurso") @db.Decimal(10, 2)
+  valorSaldoReservaGarantidora   Decimal   @map(name: "valor_saldo_reserva_garantidora") @db.Decimal(10, 2)
+  valorTotalPremioFaixaUm        Decimal   @map(name: "valor_total_premio_faixa_um") @db.Decimal(10, 2)
+  created                        DateTime  @default(now())
+  modified                       DateTime  @updatedAt
+  listaMunicipioUFGanhadores     winners[]
+  listaRateioPremio              prizes[]
+}

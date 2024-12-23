@@ -1,0 +1,14 @@
+model winners {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  ganhadores     Int      @db.Integer
+  municipio      String   @db.VarChar(255)
+  nomeFantasiaUL String   @map(name: "nome_fantasia_ul") @db.VarChar(255)
+  posicao        Int      @db.Integer
+  serie          String   @db.VarChar(255)
+  uf             String   @db.VarChar(255)
+  concurso       Int      @db.Integer
+  loteria        loterias @relation(fields: [loteria_id], references: [id])
+  loteria_id     String   @db.Uuid
+  created        DateTime @default(now())
+  modified       DateTime @updatedAt
+}

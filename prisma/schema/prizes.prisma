@@ -1,0 +1,20 @@
+enum EFaixa {
+  F15 @map("15 acertos")
+  F14 @map("14 acertos")
+  F13 @map("13 acertos")
+  F12 @map("12 acertos")
+  F11 @map("11 acertos")
+}
+
+model prizes {
+  id                 String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  descricao_faixa    EFaixa
+  faixa              Int      @db.Integer
+  numeroDeGanhadores Int      @map(name: "numero_de_ganhadores") @db.Integer
+  valorPremio        Int      @map(name: "valor_premio") @db.Integer
+  concurso           Int      @db.Integer
+  loteria            loterias @relation(fields: [loteria_id], references: [id])
+  loteria_id         String   @db.Uuid
+  created            DateTime @default(now())
+  modified           DateTime @updatedAt
+}
