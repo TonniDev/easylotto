@@ -8,6 +8,14 @@ up:
 		sleep 3
 		pnpm dev
 
+up-db:
+		docker-compose up -d
+		sleep 5
+		docker-compose ps
+
+up-server:
+		pnpm dev
+
 down:
 		docker-compose down
 

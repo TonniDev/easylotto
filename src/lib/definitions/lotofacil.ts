@@ -84,3 +84,28 @@ export type Lotofacil = {
   valorSaldoReservaGarantidora: number;
   valorTotalPremioFaixaUm: number;
 };
+
+enum EFaixa {
+  F15 = 'F15',
+  F14 = 'F14',
+  F13 = 'F13',
+  F12 = 'F12',
+  F11 = 'F11',
+}
+
+export function mapFaixaStringToEFaixa(descricaoFaixa: TFaixa) {
+  switch (descricaoFaixa) {
+    case '15 acertos':
+      return EFaixa.F15;
+    case '14 acertos':
+      return EFaixa.F14;
+    case '13 acertos':
+      return EFaixa.F13;
+    case '12 acertos':
+      return EFaixa.F12;
+    case '11 acertos':
+      return EFaixa.F11;
+    default:
+      throw new Error(`Unsupported descricaoFaixa: ${descricaoFaixa}`);
+  }
+}
