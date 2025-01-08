@@ -3,9 +3,9 @@ services:
     image: postgres
     restart: always
     environment:
-      POSTGRES_DB: easylottodb
+      POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: default
-      POSTGRES_PASSWORD: R0ot4dM1nP@s$
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
