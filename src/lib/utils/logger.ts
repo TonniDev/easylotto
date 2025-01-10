@@ -3,14 +3,13 @@ import winston from 'winston';
 const {combine, timestamp, printf, colorize, errors} = winston.format;
 
 const customFormat = printf(({level, message, timestamp, stack}) => {
-  // If there's a stack, include it in the message
   return `[${timestamp}] [${level}] ${stack || message}`;
 });
 
 const createLogger = ({filename = 'cronjob.log'}: { filename?: string }) => winston.createLogger({
   level: 'info',
   format: combine(
-    errors({stack: true}),            // <— capture stack traces
+    errors({stack: true}),
     timestamp({format: 'YYYY-MM-DD HH:mm:ss'}),
     customFormat
   ),
@@ -19,7 +18,7 @@ const createLogger = ({filename = 'cronjob.log'}: { filename?: string }) => wins
     new winston.transports.Console({
       format: combine(colorize(), customFormat),
     }),
-    // 2) File (optional)
+    // 2) File
     new winston.transports.File({filename}),
   ],
 });
