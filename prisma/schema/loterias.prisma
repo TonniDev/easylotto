@@ -20,13 +20,13 @@ model loterias {
   tipoJogo                       String    @map(name: "tipo_jogo") @db.VarChar(255)
   tipoPublicacao                 Int       @map(name: "tipo_publicacao") @db.Integer
   ultimoConcurso                 Boolean   @map(name: "ultimo_concurso") @db.Boolean
-  valorArrecadado                Decimal   @map(name: "valor_arrecadado") @db.Decimal(10, 2)
-  valorAcumuladoConcurso_0_5     Decimal   @map(name: "valor_acumulado_concurso_0_5") @db.Decimal(10, 2)
-  valorAcumuladoConcursoEspecial Decimal   @map(name: "valor_acumulado_concurso_especial") @db.Decimal(10, 2)
-  valorAcumuladoProximoConcurso  Decimal   @map(name: "valor_acumulado_proximo_concurso") @db.Decimal(10, 2)
-  valorEstimadoProximoConcurso   Decimal   @map(name: "valor_estimado_proximo_concurso") @db.Decimal(10, 2)
-  valorSaldoReservaGarantidora   Decimal   @map(name: "valor_saldo_reserva_garantidora") @db.Decimal(10, 2)
-  valorTotalPremioFaixaUm        Decimal   @map(name: "valor_total_premio_faixa_um") @db.Decimal(10, 2)
+  valorArrecadado                Decimal   @map(name: "valor_arrecadado") @db.Decimal(14, 2)
+  valorAcumuladoConcurso_0_5     Decimal   @map(name: "valor_acumulado_concurso_0_5") @db.Decimal(14, 2)
+  valorAcumuladoConcursoEspecial Decimal   @map(name: "valor_acumulado_concurso_especial") @db.Decimal(14, 2)
+  valorAcumuladoProximoConcurso  Decimal   @map(name: "valor_acumulado_proximo_concurso") @db.Decimal(14, 2)
+  valorEstimadoProximoConcurso   Decimal   @map(name: "valor_estimado_proximo_concurso") @db.Decimal(14, 2)
+  valorSaldoReservaGarantidora   Decimal   @map(name: "valor_saldo_reserva_garantidora") @db.Decimal(14, 2)
+  valorTotalPremioFaixaUm        Decimal   @map(name: "valor_total_premio_faixa_um") @db.Decimal(14, 2)
   created                        DateTime  @default(now())
   modified                       DateTime  @updatedAt
   listaMunicipioUFGanhadores     winners[]

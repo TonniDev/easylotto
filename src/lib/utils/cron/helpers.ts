@@ -3,6 +3,9 @@ import {LotteryRepository} from "@lib/domains/lottery/repository";
 import {AxiosService} from "@lib/Network/AxiosService";
 import {AxiosError} from "axios";
 import {setTimeout as delay} from 'node:timers/promises';
+import createLogger from "@lib/utils/logger";
+
+const logger = createLogger({});
 
 const RETRY_DELAY_MS = 2000;
 
@@ -57,7 +60,7 @@ export async function fetchItemWithRetries(number: number, retries: number): Pro
       return await repository.getItem({data: {number}});
     } catch (err: any) {
       if (isTransientError(err)) {
-        console.warn(
+        logger.warn(
           `Transient error on item ${number} (attempt ${attempt}/${retries}): ${err.message}`
         );
         lastError = err;
@@ -66,7 +69,7 @@ export async function fetchItemWithRetries(number: number, retries: number): Pro
           await delay(RETRY_DELAY_MS);
         }
       } else {
-        console.error(`Non-transient error on item ${number}: ${err.message}`);
+        logger.error(`Non-transient error on item ${number}: ${err.message}`);
         throw err;
       }
     }

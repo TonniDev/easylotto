@@ -5,7 +5,6 @@ import { Lotofacil } from "@lib/definitions/lotofacil";
 
 export async function POST(req: NextRequest) {
   const payload = await req.json();
-  console.log(payload);
   const repository = new LotteryRepository(new AxiosService<
     Lotofacil,
     GetHistoricalDataPayload,
