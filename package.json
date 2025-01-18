@@ -9,7 +9,10 @@
     "start": "next start",
     "lint": "next lint",
     "migration:create:dev": "prisma migrate dev --create-only",
-    "migrate:dev": "prisma migrate dev"
+    "migrate:dev": "prisma migrate dev",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
     "@nextui-org/react": "^2.6.8",
@@ -22,10 +25,15 @@
     "qs": "^6.13.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "winston": "^3.10.0"
+    "winston": "^3.10.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@faker-js/faker": "^9.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/minimist": "^1.2.5",
     "@types/node": "^20",
     "@types/node-cron": "^3.0.11",
@@ -35,11 +43,14 @@
     "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "15.1.2",
+    "jsdom": "^26.0.0",
     "minimist": "^1.2.8",
     "node-cron": "^3.0.3",
     "postcss": "^8",
     "prisma": "^6.1.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^2.1.8"
   }
 }

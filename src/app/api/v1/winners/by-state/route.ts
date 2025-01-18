@@ -13,6 +13,11 @@ export async function GET() {
         ganhadores: true,
       },
     });
+    
+    const totalGames = await prisma.loterias.findFirst({
+      orderBy: {numero: 'desc'},
+      select: {numero: true},
+    });
 
     // Step 2: Calculate the total number of winners across all states
     const totalWinners = results.reduce((sum, state) => sum + (state._sum.ganhadores || 0), 0);
@@ -30,6 +35,7 @@ export async function GET() {
     // Step 5: Return the JSON response
     return NextResponse.json({
       totalWinners,
+      totalGames: totalGames?.numero || null,
       data: response,
     });
   } catch (error) {

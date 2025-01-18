@@ -1,7 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": [
+      "vitest/globals",
+      "vite/client",
+      "node",
+      "@testing-library/jest-dom"
+    ],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -20,10 +30,23 @@
       }
     ],
     "paths": {
-      "@ui/*": ["./src/ui/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@ui/*": [
+        "./src/ui/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ]
     }
   },
-  "include": ["./next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "scripts/seed.js"],
-  "exclude": ["node_modules", "**/*.prisma"]
+  "include": [
+    "./next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "scripts/seed.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.prisma"
+  ]
 }
