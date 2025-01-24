@@ -1,7 +1,7 @@
 "use client";
 import {Winners} from "@lib/definitions/winners";
 import {STATES} from "@lib/utils/constants";
-import {getKeyValue, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow} from "@nextui-org/react";
+import {getKeyValue, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow} from "@heroui/react";
 import {JSX, useCallback, useMemo} from "react";
 import columnSchema from "./winners.columns";
 
@@ -32,7 +32,7 @@ export const WinnersTable: React.FC<WinnersTableProps> = ({winners}) => {
   }, []);
 
   return (
-    <Table aria-label="Winners table" data-testid="table" border={1}>
+    <Table aria-label="Winners table" data-testid="table" isStriped>
       <TableHeader columns={columnSchema}>
         {(column) => (
           <TableColumn key={column.key} className="align-middle text-center">
@@ -42,7 +42,7 @@ export const WinnersTable: React.FC<WinnersTableProps> = ({winners}) => {
       </TableHeader>
       <TableBody items={list} emptyContent="No data found.">
         {(item) => (
-          <TableRow key={item.state} className="odd:bg-gray-900">
+          <TableRow key={item.state}>
             {(columnKey) => {
               const value = getKeyValue(item, columnKey);
               return (
