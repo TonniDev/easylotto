@@ -111,7 +111,7 @@ describe("Math utils", () => {
       currList: list,
       pool: fibonacciPool,
       maxAmount: 3,
-      prevNumTypeFilterFunc: (num: number) => !isPrime(num),
+      prevNumTypeFilterFunc: (num: number | string) => !isPrime(num),
       currNumTypeFilterFunc: isFibonacci,
     });
 
