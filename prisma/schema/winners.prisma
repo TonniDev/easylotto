@@ -7,8 +7,8 @@ model winners {
   serie          String   @db.VarChar(255)
   uf             String   @db.VarChar(255)
   concurso       Int      @db.Integer
-  loteria        loterias @relation(fields: [loteria_id], references: [id])
-  loteria_id     String   @db.Uuid
+  loteria        loterias @relation(fields: [loteria_numero], references: [numero])
+  loteria_numero Int      @db.Integer
   created        DateTime @default(now())
   modified       DateTime @updatedAt
 }

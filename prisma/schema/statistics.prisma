@@ -1,0 +1,7 @@
+model statistics {
+  statKey String   @id @unique @db.VarChar(255)
+  value   Int      @db.Integer
+  games   String[] @db.Text
+
+  @@index([statKey])
+}

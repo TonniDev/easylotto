@@ -1,5 +1,5 @@
 model loterias {
-  id                             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                             String    @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   acumulado                      Boolean   @db.Boolean
   dataApuracao                   String    @map(name: "data_apuracao") @db.VarChar(10)
   dataProximoConcurso            String    @map(name: "data_proximo_concurso") @db.VarChar(10)
@@ -11,7 +11,7 @@ model loterias {
   localSorteio                   String    @map(name: "local_sorteio") @db.VarChar(255)
   nomeMunicipioUFSorteio         String    @map(name: "nome_municipio_uf_sorteio") @db.VarChar(255)
   nomeTimeCoracaoMesSorte        String    @map(name: "nome_time_coracao_mes_sorte") @db.VarChar(255)
-  numero                         Int       @db.Integer
+  numero                         Int       @id @unique @db.Integer
   numeroConcursoAnterior         Int       @map(name: "numero_concurso_anterior") @db.Integer
   numeroConcursoFinal_0_5        Int       @map(name: "numero_concurso_final_0_5") @db.Integer
   numeroConcursoProximo          Int       @map(name: "numero_concurso_proximo") @db.Integer
@@ -31,4 +31,6 @@ model loterias {
   modified                       DateTime  @updatedAt
   listaMunicipioUFGanhadores     winners[]
   listaRateioPremio              prizes[]
+
+  @@index([id, numero])
 }

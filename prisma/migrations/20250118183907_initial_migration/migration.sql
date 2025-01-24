@@ -1,4 +1,6 @@
+-- Create support for uuid_generate_v4()
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- CreateEnum
 CREATE TYPE "EFaixa" AS ENUM ('15 acertos', '14 acertos', '13 acertos', '12 acertos', '11 acertos');
 
@@ -25,17 +27,17 @@ CREATE TABLE "loterias" (
     "tipo_jogo" VARCHAR(255) NOT NULL,
     "tipo_publicacao" INTEGER NOT NULL,
     "ultimo_concurso" BOOLEAN NOT NULL,
-    "valor_arrecadado" DECIMAL(10,2) NOT NULL,
-    "valor_acumulado_concurso_0_5" DECIMAL(10,2) NOT NULL,
-    "valor_acumulado_concurso_especial" DECIMAL(10,2) NOT NULL,
-    "valor_acumulado_proximo_concurso" DECIMAL(10,2) NOT NULL,
-    "valor_estimado_proximo_concurso" DECIMAL(10,2) NOT NULL,
-    "valor_saldo_reserva_garantidora" DECIMAL(10,2) NOT NULL,
-    "valor_total_premio_faixa_um" DECIMAL(10,2) NOT NULL,
+    "valor_arrecadado" DECIMAL(14,2) NOT NULL,
+    "valor_acumulado_concurso_0_5" DECIMAL(14,2) NOT NULL,
+    "valor_acumulado_concurso_especial" DECIMAL(14,2) NOT NULL,
+    "valor_acumulado_proximo_concurso" DECIMAL(14,2) NOT NULL,
+    "valor_estimado_proximo_concurso" DECIMAL(14,2) NOT NULL,
+    "valor_saldo_reserva_garantidora" DECIMAL(14,2) NOT NULL,
+    "valor_total_premio_faixa_um" DECIMAL(14,2) NOT NULL,
     "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "loterias_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "loterias_pkey" PRIMARY KEY ("numero")
 );
 
 -- CreateTable
@@ -44,9 +46,9 @@ CREATE TABLE "prizes" (
     "descricao_faixa" "EFaixa" NOT NULL,
     "faixa" INTEGER NOT NULL,
     "numero_de_ganhadores" INTEGER NOT NULL,
-    "valor_premio" INTEGER NOT NULL,
+    "valor_premio" DECIMAL(10,2) NOT NULL,
     "concurso" INTEGER NOT NULL,
-    "loteria_id" UUID NOT NULL,
+    "loteria_numero" INTEGER NOT NULL,
     "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified" TIMESTAMP(3) NOT NULL,
 
@@ -63,15 +65,24 @@ CREATE TABLE "winners" (
     "serie" VARCHAR(255) NOT NULL,
     "uf" VARCHAR(255) NOT NULL,
     "concurso" INTEGER NOT NULL,
-    "loteria_id" UUID NOT NULL,
+    "loteria_numero" INTEGER NOT NULL,
     "created" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "winners_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "prizes" ADD CONSTRAINT "prizes_loteria_id_fkey" FOREIGN KEY ("loteria_id") REFERENCES "loterias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "loterias_id_key" ON "loterias"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "loterias_numero_key" ON "loterias"("numero");
+
+-- CreateIndex
+CREATE INDEX "loterias_id_idx" ON "loterias"("id");
 
 -- AddForeignKey
-ALTER TABLE "winners" ADD CONSTRAINT "winners_loteria_id_fkey" FOREIGN KEY ("loteria_id") REFERENCES "loterias"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "prizes" ADD CONSTRAINT "prizes_loteria_numero_fkey" FOREIGN KEY ("loteria_numero") REFERENCES "loterias"("numero") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "winners" ADD CONSTRAINT "winners_loteria_numero_fkey" FOREIGN KEY ("loteria_numero") REFERENCES "loterias"("numero") ON DELETE RESTRICT ON UPDATE CASCADE;

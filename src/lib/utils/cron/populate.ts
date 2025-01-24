@@ -1,4 +1,4 @@
-import {fetchItemWithRetries, getTotalItemsToRun} from "@lib/utils/cron/helpers";
+import {fetchItemWithRetries, getLastLotofacilLotteryGame} from "@lib/utils/cron/helpers";
 import {createLotofacil, CreateLotofacilReturn} from "@lib/utils/db/lotofacil";
 import * as Sentry from "@sentry/node";
 import minimist from 'minimist';
@@ -43,7 +43,7 @@ async function processItem(number: number): Promise<CreateLotofacilReturn> {
 
 async function startCronJob() {
   try {
-    const totalItems = await getTotalItemsToRun(itemsToRun);
+    const totalItems = await getLastLotofacilLotteryGame();
     logger.info(`Total items to process: ${totalItems}`);
 
     let isRunning = false;

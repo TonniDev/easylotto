@@ -13,8 +13,8 @@ model prizes {
   numeroDeGanhadores Int      @map(name: "numero_de_ganhadores") @db.Integer
   valorPremio        Decimal  @map(name: "valor_premio") @db.Decimal(10, 2)
   concurso           Int      @db.Integer
-  loteria            loterias @relation(fields: [loteria_id], references: [id])
-  loteria_id         String   @db.Uuid
+  loteria            loterias @relation(fields: [loteria_numero], references: [numero])
+  loteria_numero     Int      @db.Integer
   created            DateTime @default(now())
   modified           DateTime @updatedAt
 }

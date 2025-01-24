@@ -1,10 +1,15 @@
 import {Lotofacil, mapFaixaStringToEFaixa} from "@lib/definitions/lotofacil";
 import {prisma} from "@lib/prisma";
+import {generateKeyByAttributesCount, upsertStatistics} from "@lib/utils/cron/helpers";
 
 export interface CreateLotofacilReturn {
-  id: string | null,
-  gameNumber: number,
-  error: Error | null,
+  id: string | null;
+  gameNumber: number;
+  statistics: {
+    occurrences: number,
+    combinationKey: string,
+  }[];
+  error: Error | null;
 }
 
 function removeNullBytes(str: string | null | undefined): string {
@@ -35,6 +40,7 @@ export function getWinnersDataFromItem(itemData: Lotofacil) {
 }
 
 export function mountItemData(itemData: Lotofacil) {
+
   return {
     acumulado: itemData.acumulado ?? false,
     dataApuracao: itemData.dataApuracao ?? '',
@@ -72,6 +78,27 @@ export function mountItemData(itemData: Lotofacil) {
   };
 }
 
+export async function upsertStatistic(key: string, gameNumber: number) {
+  try {
+    return await prisma.statistics.upsert({
+      where: {
+        statKey: key,
+      },
+      update: {
+        value: { increment: 1 },
+        games: { push: String(gameNumber) },
+      },
+      create: {
+        statKey: key,
+        value: 1,
+        games: [String(gameNumber)],
+      }
+    });
+  } catch (error: any) {
+    throw error;
+  }
+}
+
 export async function createLotofacil(itemData: Lotofacil): Promise<CreateLotofacilReturn> {
   try {
 
@@ -79,9 +106,12 @@ export async function createLotofacil(itemData: Lotofacil): Promise<CreateLotofa
       data: mountItemData(itemData),
     });
 
+    const statistics = await upsertStatistics(savedItem.listaDezenas, savedItem.numero);
+
     return {
       id: savedItem.id,
       gameNumber: savedItem.numero,
+      statistics,
       error: null,
     }
   } catch (error: any) {

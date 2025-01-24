@@ -25,5 +25,8 @@ migrations:
 migrate:
 		dotenv -f .env.local pnpm migrate:dev
 
+rollback:
+		dotenv -f .env.local pnpm migrate:reset:dev
+
 status:
 		docker-compose ps
