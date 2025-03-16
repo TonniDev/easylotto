@@ -2,14 +2,14 @@
 
 # Main docker compose script
 up:
-		docker-compose up -d
+		docker-compose --env-file .env.local up -d
 		sleep 5
 		docker-compose ps
 		sleep 3
 		pnpm dev
 
 up-db:
-		docker-compose up -d
+		docker-compose --env-file .env.local up -d
 		sleep 5
 		docker-compose ps
 
@@ -30,3 +30,15 @@ rollback:
 
 status:
 		docker-compose ps
+
+test:
+		pnpm vitest
+
+test-run:
+		pnpm vitest --run
+
+test-watch:
+		pnpm vittest --watch
+
+test-coverage:
+		pnpm vittest --coverage

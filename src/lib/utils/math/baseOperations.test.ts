@@ -118,14 +118,6 @@ describe("Math utils", () => {
     const primeQuantity = countNumbersByCondition(list, isPrime);
     const fibonacciQuantity = countNumbersByCondition(list, isFibonacci);
 
-    console.log({
-      fibo: getFibonacciNumbersUpToX(25).length,
-      prime: getPrimeNumbersUpToX(25).length,
-      multi: getMultiplesOf3UpToX(25).length,
-      odd: Array.from({length: 25}, (_, i) => i).filter(isOdd).length,
-      even: Array.from({length: 25}, (_, i) => i).filter(isEven).length
-  });
-
     expect(primeQuantity).toBe(3);
     expect(fibonacciQuantity).toBe(3);
     expect(list.length).toSatisfy((length: number) => length <= 5 && length >= 3);

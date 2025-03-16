@@ -39,3 +39,9 @@ export function isMultipleOf3(item: number | string): boolean {
   let num = convertToNumber(item);
   return num % 3 === 0;
 }
+
+export function isSameList(list1: number[], list2: number[]): boolean {
+  return list1.length === list2.length
+    && list1.every((val, index) => val === list2[index])
+    && list1.join(',') === list2.join(',');
+}
