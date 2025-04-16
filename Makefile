@@ -20,10 +20,10 @@ down:
 		docker-compose down
 
 migrations:
-		dotenv -f .env.local pnpm migration:create:dev
+		dotenv -e .env.local pnpm migration:create:dev
 
 migrate:
-		dotenv -f .env.local pnpm migrate:dev
+		dotenv -e .env.local pnpm migrate:dev
 
 rollback:
 		dotenv -f .env.local pnpm migrate:reset:dev

@@ -13,12 +13,14 @@ export async function GET(request: Request) {
   const gameValue_gt = searchParams.get('gameValue_gt') !== null ? parseInt(searchParams.get('gameValue_gt') as string, 10) : 3000;
 
   try {
+    // noinspection SqlResolve
     const rawQuery = Prisma.sql`
         SELECT "statKey",
                "value",
-               ${includeGames ? Prisma.sql`"games",` : Prisma.sql``} (SELECT MAX(CAST(g AS INTEGER))
-         FROM unnest("games") AS g
-         WHERE CAST(g AS INTEGER) >= ${gameValue_gt}) AS "maxGameValue"
+               ${includeGames ? Prisma.sql`"games",` : Prisma.sql``}
+               (SELECT MAX(CAST(g AS INTEGER))
+                FROM unnest("games") AS g
+                WHERE CAST(g AS INTEGER) >= ${gameValue_gt}) AS maxGameValue
         FROM "statistics"
         WHERE "statKey" LIKE ${key + '%'}
           AND "value" >= ${occurrences_gte}
