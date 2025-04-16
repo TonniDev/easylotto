@@ -11,20 +11,20 @@ export interface AddNumbersToSetArgs {
 }
 
 export interface Constraints {
-  even: number;
-  odd: number;
-  prime: number;
-  fibonacci: number;
-  multipleOf3: number;
+  even: number | null;
+  odd: number | null;
+  prime: number | null;
+  fibonacci: number | null;
+  multipleOf3: number | null;
 }
 
 export type PossibleConstraints = Partial<Constraints>;
 
 export interface GenerateRandomSetsOptions {
-  amountOfSets?: number,
-  itemsInSet?: number,
-  constraints: PossibleConstraints,
-  startEnd?: [number, number];
+  amountOfSets?: number;
+  itemsInSet?: number;
+  constraints?: PossibleConstraints;
+  startEnd?: number[];
 }
 
 export interface BacktrackArgs {

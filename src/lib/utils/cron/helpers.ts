@@ -4,6 +4,7 @@ import {AxiosService} from "@lib/Network/AxiosService";
 import {upsertStatistic} from "@lib/utils/db/lotofacil";
 import {isEven, isFibonacci, isMultipleOf3, isOdd, isPrime} from "@lib/utils/math/baseOperations";
 import {countNumbersByCondition} from "@lib/utils/math/numberGenerator";
+import {GenerateRandomSetsOptions} from "@lib/utils/math/types";
 import {AxiosError} from "axios";
 import {setTimeout as delay} from 'node:timers/promises';
 import createLogger from "@lib/utils/logger";

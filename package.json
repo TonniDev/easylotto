@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3030",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -16,7 +16,7 @@
     "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "@heroui/react": "2.6.14",
+    "@heroui/react": "^2.7.5",
     "@hookform/resolvers": "^3.10.0",
     "@prisma/client": "^6.2.1",
     "@sentry/node": "^8.48.0",

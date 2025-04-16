@@ -13,7 +13,7 @@ Sentry.init({
 
 /**
  * Example usage:
- *   dotenv -f .env.local npx tsx src/lib/utils/cron/update.ts --item=203 --throttle=2
+ *   dotenv -e .env.local npx tsx src/lib/utils/cron/update.ts --item=203 --throttle=2
  *
  * Flags:
  *   --throttle=S   => Run job every S seconds (default = 1 second)

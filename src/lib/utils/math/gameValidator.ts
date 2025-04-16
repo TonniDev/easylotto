@@ -29,6 +29,7 @@ function tryIncludeNumber(
 
   (Object.keys(includeConstraints) as (keyof Constraints)[]).forEach((key) => {
     if (
+      (includeConstraints[key] && maxPossibleCounts[key]) &&
       includeConstraints[key] < maxPossibleCounts[key] &&
       doesNumberSatisfyConstraint(key, num)
     ) {

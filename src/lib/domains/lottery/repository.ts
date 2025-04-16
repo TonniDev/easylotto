@@ -1,6 +1,7 @@
 import {Lotofacil} from "@lib/definitions/lotofacil";
 import {AxiosService} from "@lib/Network/AxiosService";
 import {INetworkService, IRequestConfig} from "@lib/Network/types";
+import {GenerateRandomSetsOptions} from "@lib/utils/math/types";
 import {AxiosResponse} from "axios";
 
 export interface GetHistoricalDataPayload {
@@ -23,6 +24,7 @@ export class LotteryRepository implements ILotteryRepository {
 
   BASE_URL = 'https://servicebus2.caixa.gov.br/portaldeloterias/api';
   LOTOFACIL_URL = '/lotofacil';
+  GAMES_URL = '/games';
 
   constructor(private readonly networkService: AxiosService<
     Lotofacil,
@@ -92,5 +94,14 @@ export class LotteryRepository implements ILotteryRepository {
 
     // Start recursive fetching
     return fetchData(payload?.start || 1, []);
+  }
+
+  /** TODO: Create a different repository for this method for proper typing */
+  async generateNumbers(payload: GenerateRandomSetsOptions) {
+    const results = await this.networkService.post(`${this.GAMES_URL}/generate`, {
+      data: payload
+    });
+
+    return results.data;
   }
 }
