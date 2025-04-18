@@ -20,7 +20,7 @@ export async function GET(request: Request) {
                ${includeGames ? Prisma.sql`"games",` : Prisma.sql``}
                (SELECT MAX(CAST(g AS INTEGER))
                 FROM unnest("games") AS g
-                WHERE CAST(g AS INTEGER) >= ${gameValue_gt}) AS maxGameValue
+                WHERE CAST(g AS INTEGER) >= ${gameValue_gt}) AS lastOccurrence
         FROM "statistics"
         WHERE "statKey" LIKE ${key + '%'}
           AND "value" >= ${occurrences_gte}

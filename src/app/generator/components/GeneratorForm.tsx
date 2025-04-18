@@ -57,7 +57,7 @@ export default function GeneratorForm({statistics, onSubmit}: GeneratorFormProps
 
     return statistics.results.map(item => ({
       key: item.statKey,
-      label: `Preset ${item.statKey}`,
+      label: `Preset ${item.statKey} - ${item.lastoccurrence} - ${item.value} occurrences`,
       constraints: parseStatKey(item.statKey)
     }));
   }, [statistics]);
