@@ -96,6 +96,12 @@ export class LotteryRepository implements ILotteryRepository {
     return fetchData(payload?.start || 1, []);
   }
 
+  async getLotofacilHistoricalGamesNumbersOnly(): Promise<string[][]> {
+    const results = await this.networkService.get("/lottery/lotofacil");
+
+    return results.data;
+  }
+
   /** TODO: Create a different repository for this method for proper typing */
   async generateNumbers(payload: GenerateRandomSetsOptions) {
     const results = await this.networkService.post(`${this.GAMES_URL}/generate`, {

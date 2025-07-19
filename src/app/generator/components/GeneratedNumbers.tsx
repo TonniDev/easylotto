@@ -1,22 +1,21 @@
 "use client";
 
-import {Card, CardBody, CardHeader} from "@heroui/card";
-import {Button, Checkbox, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure} from "@heroui/react";
-import {isEven, isFibonacci, isMultipleOf3, isOdd, isPrime} from "@lib/utils/math/baseOperations";
+import {Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure} from "@heroui/react";
 import {saveGames} from "@lib/utils/saveGames";
 import {useState} from "react";
 import {GeneratedGameCard} from "./GeneratedGameCard";
 
 interface GeneratedNumbersProps {
   generatedNumbers: number[][] | null;
+  sourceData: string[][];
 }
 
-export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
+export const GeneratedNumbers = ({generatedNumbers, sourceData}: GeneratedNumbersProps) => {
   const [selectedGames, setSelectedGames] = useState<number[]>([]);
   const [email, setEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [saveResult, setSaveResult] = useState<{success: boolean; message: string} | null>(null);
+  const [saveResult, setSaveResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const {isOpen, onOpen, onClose} = useDisclosure();
 
@@ -62,19 +61,6 @@ export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
         name,
         numbers: selectedNumberSets,
       });
-      /*const response = await fetch('/api/v1/games/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          name,
-          numbers: selectedNumberSets,
-        }),
-      });
-
-      const result = await response.json();*/
 
       setSaveResult({
         success: true,
@@ -102,8 +88,8 @@ export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
       {/* Save button - appears when at least one game is selected */}
       {selectedGames.length > 0 && (
         <div className="mb-4 flex justify-end">
-          <Button 
-            color="primary" 
+          <Button
+            color="primary"
             onClick={handleSaveClick}
           >
             Save Selected Games ({selectedGames.length})
@@ -113,13 +99,13 @@ export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
 
       {/* Toast notification for success/error messages */}
       {saveResult && (
-        <div 
+        <div
           className={`mb-4 p-4 rounded-md flex justify-between items-center ${
             saveResult.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
           }`}
         >
           <span>{saveResult.message}</span>
-          <button 
+          <button
             onClick={closeToast}
             className="text-gray-500 hover:text-gray-700"
           >
@@ -132,7 +118,15 @@ export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {generatedNumbers.map((set, setIndex) => {
           const key = `game_${setIndex}-${set.join('_')}`;
-          return <GeneratedGameCard key={key} set={set} index={setIndex} selectedGames={selectedGames} toggleGameSelection={toggleGameSelection} />;
+          return (
+            <GeneratedGameCard
+              key={key}
+              set={set}
+              index={setIndex}
+              selectedGames={selectedGames}
+              toggleGameSelection={toggleGameSelection}
+              sourceData={sourceData}
+            />);
         })}
       </div>
 
@@ -171,12 +165,12 @@ export const GeneratedNumbers = ({generatedNumbers}: GeneratedNumbersProps) => {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="light" onClick={onClose}>
+            <Button color="danger" variant="light" onPress={onClose}>
               Cancel
             </Button>
-            <Button 
-              color="primary" 
-              onClick={handleSaveConfirm}
+            <Button
+              color="primary"
+              onPress={handleSaveConfirm}
               isLoading={isSaving}
             >
               Save

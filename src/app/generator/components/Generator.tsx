@@ -6,7 +6,7 @@ import {useCallback, useState} from "react";
 import {GeneratedNumbers} from "./GeneratedNumbers";
 import GeneratorForm, {GeneratorFormProps, LotofacilFormValues} from "./GeneratorForm";
 
-export const Generator = ({statistics}: Pick<GeneratorFormProps, "statistics">) => {
+export const Generator = ({statistics, allGames}: Pick<GeneratorFormProps, "statistics"> & {allGames: string[][]}) => {
   const [generatedNumbers, setGeneratedNumbers] = useState<number[][] | null>(null);
 
   const onSubmit = useCallback(async (data: LotofacilFormValues) => {
@@ -21,7 +21,7 @@ export const Generator = ({statistics}: Pick<GeneratorFormProps, "statistics">) 
   return (
     <>
       <GeneratorForm statistics={statistics} onSubmit={onSubmit} />
-      <GeneratedNumbers generatedNumbers={generatedNumbers} />
+      <GeneratedNumbers generatedNumbers={generatedNumbers} sourceData={allGames} />
     </>
   )
 }

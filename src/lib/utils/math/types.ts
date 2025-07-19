@@ -11,11 +11,11 @@ export interface AddNumbersToSetArgs {
 }
 
 export interface Constraints {
-  even: number | null;
-  odd: number | null;
-  prime: number | null;
-  fibonacci: number | null;
-  multipleOf3: number | null;
+  even: number;
+  odd: number;
+  prime: number;
+  fibonacci: number;
+  multipleOf3: number;
 }
 
 export type PossibleConstraints = Partial<Constraints>;
@@ -38,4 +38,9 @@ export interface InitializeConstraintsReturn {
   numbersInRange: number[];
   maxPossibleCounts: Constraints;
   initialConstraints: Constraints;
+}
+
+export interface PaginatedConstraints {
+  combinations: Constraints[];
+  totalCount: number;
 }

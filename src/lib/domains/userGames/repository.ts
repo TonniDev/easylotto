@@ -19,15 +19,21 @@ export interface SaveGameResult {
   error?: any;
 }
 
+export interface SavedGamesParams {
+  email?: string;
+  name?: string;
+}
+
 export interface IUserGamesRepository {
   saveGames(data: SaveGameData): Promise<SaveGameData[]>;
-
-  getGamesByEmail(email: string): Promise<any>;
+  getGamesByEmail(params?: SavedGamesParams): Promise<any>;
 }
 
 export class UserGamesRepository implements IUserGamesRepository {
 
-  BASE_URL = '/games/save';
+  BASE_URL = '/games';
+  SAVE_URL = '/save';
+  SAVED_GAMES_URL = '/saved';
 
   constructor(
     private readonly networkService: AxiosService<SaveGameData[], SaveGameData, Record<string, string>>,
@@ -37,33 +43,26 @@ export class UserGamesRepository implements IUserGamesRepository {
 
   async saveGames(data: SaveGameData): Promise<SaveGameData[]> {
     const response = await this.networkService.post(
-      this.BASE_URL, { data: data }
+      `${this.BASE_URL}${this.SAVE_URL}`, { data: data }
     );
     return response.data;
   }
 
-  async getGamesByEmail(email: string): Promise<any> {
-    try {
-      const games = await prisma.saved_games.findMany({
-        where: {
-          email,
-        },
-        orderBy: {
-          created: 'desc',
-        },
-      });
-
-      return {
-        success: true,
-        games,
-      };
-    } catch (error) {
-      console.error("Error fetching games:", error);
-      return {
-        success: false,
-        message: "Failed to fetch games",
-        error,
-      };
+  async getGamesByEmail(params?: {email?: string; name?: string}): Promise<any> {
+    const {email, name} = params || {};
+    let paramsString = '';
+    if (email) {
+      paramsString += `email=${email}`;
     }
+    if (name) {
+      paramsString += `${email ? '&' : ''}name=${name}`;
+    }
+    if (paramsString) {
+      paramsString = `?${paramsString}`;
+    }
+
+    const games = await this.networkService.get(`${this.BASE_URL}${this.SAVED_GAMES_URL}${paramsString}`);
+    return games.data;
+
   }
 }

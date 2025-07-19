@@ -7,9 +7,71 @@ interface GeneratedGameCardProps {
   index: number;
   selectedGames: number[];
   toggleGameSelection: (index: number) => void;
+  sourceData: string[][];
 }
 
-export const GeneratedGameCard = ({set, index, selectedGames, toggleGameSelection}: GeneratedGameCardProps) => {
+const getMatchingSetsCount = (
+  set: number[],
+  sourceSet: number[],
+  index: number,
+  acc: Record<string, number[]>
+) => {
+  const intersection = [...set].filter((num) => sourceSet.includes(num));
+  const scores = [15, 14, 13, 12, 11];
+
+  scores.forEach((score) => {
+    if (intersection.length >= score) {
+      acc[score].push(index + 1);
+    }
+  });
+
+  return acc;
+};
+
+const countNumbersByCondition = (
+  numbers: number[],
+  condition: (n: number) => boolean
+) => {
+  return [...numbers].filter(condition).length;
+};
+
+const analyzeNumberSet = (set: number[], sourceData: string[][]) => {
+  const oddCount = countNumbersByCondition(set, (num) => num % 2 !== 0);
+  const evenCount = countNumbersByCondition(set, (num) => num % 2 === 0);
+  const primeCount = countNumbersByCondition(set, isPrime);
+  const multipleOfThreeCount = countNumbersByCondition(
+    set,
+    (num) => num % 3 === 0
+  );
+  const fibonacciCount = countNumbersByCondition(set, isFibonacci);
+
+  const initialMatchingSets = { 15: [], 14: [], 13: [], 12: [], 11: [] };
+  const matchingSets = sourceData.reduce<Record<string, number[]>>(
+    (acc, sourceSet, index) => getMatchingSetsCount(set, sourceSet.map(item => Number(item)), index, acc),
+    initialMatchingSets
+  );
+
+  return {
+    numbers: set,
+    oddCount,
+    evenCount,
+    primeCount,
+    multipleOfThreeCount,
+    fibonacciCount,
+    matchingSets,
+  };
+};
+
+export const GeneratedGameCard = ({
+  set,
+  index,
+  selectedGames,
+  toggleGameSelection,
+  sourceData,
+}: GeneratedGameCardProps) => {
+
+  const analysis = analyzeNumberSet(set, sourceData);
+
   // Use the useDisclosure hook to manage the drawer state
   const {isOpen, onOpen, onClose} = useDisclosure();
 
@@ -85,14 +147,21 @@ export const GeneratedGameCard = ({set, index, selectedGames, toggleGameSelectio
       </CardBody>
 
       {/* Drawer for detailed game information */}
-      <Drawer isOpen={isOpen} onClose={onClose} placement="bottom">
+      <Drawer isOpen={isOpen} onClose={onClose} placement="bottom" size="full">
         <DrawerContent className="bg-background dark:bg-background">
           <DrawerHeader className="border-b border-divider">Game {index + 1} Details</DrawerHeader>
           <DrawerBody>
             <div className="p-4">
               <h3 className="text-xl font-bold mb-4">Game Information</h3>
-              <p className="mb-2">This is a placeholder for detailed game information.</p>
-              <p className="mb-2">In the future, this drawer will contain more comprehensive statistics and analysis about this game.</p>
+                {Object.entries(analysis.matchingSets).sort(([scoreA],[scoreB]) => scoreB - scoreA).map(([score, sets]) => {
+                  const limit = score === "11" ? 3000 : score === "12" ? 2000 : 0;
+                  return (
+                    <p key={score} className="p-2">
+                      <strong>{score}:</strong> {sets.sort((a, b) => a - b).filter(n => n > limit).join(', ') || '--'}
+                    </p>
+                  )
+                })}
+              <p className="mb-2">In the future, this drawer will contain more comprehensive statistics and analysis of this game.</p>
               <div className="mt-4">
                 <h4 className="text-lg font-semibold mb-2">Game Numbers</h4>
                 <div className="flex flex-wrap gap-2">

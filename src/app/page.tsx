@@ -9,6 +9,8 @@ export default function Home() {
           <Link href="/generator">Generator</Link>
           <Link href="/possible-combinations">Possible combinations</Link>
           <Link href="/winners-per-state">Winners per state</Link>
+          <Link href="/my-games">My Games</Link>
+          <Link href="/statistics">Statistics</Link>
         </div>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
