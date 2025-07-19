@@ -1,9 +1,9 @@
 "use client";
-import {Winners} from "@lib/definitions/winners";
+import {Winners, WinnersByState} from "@lib/definitions/winners";
 import {STATES} from "@lib/utils/constants";
 import {getKeyValue, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow} from "@heroui/react";
-import {JSX, useCallback, useMemo} from "react";
-import columnSchema from "./winners.columns";
+import {useCallback, useMemo} from "react";
+import columnSchema, {PercentageColumnKey, TotalWinnersColumnKey} from "./winners.columns";
 
 export interface WinnersTableProps {
   winners: Winners;
@@ -11,17 +11,17 @@ export interface WinnersTableProps {
 
 export const WinnersTable: React.FC<WinnersTableProps> = ({winners}) => {
 
-  const list = useMemo(() => (winners?.data && winners.data.length ? winners.data.filter(data => [...STATES, '--'].includes(data.state)) : []), [winners]);
+  const list = useMemo<WinnersByState[]>(() => (winners?.data && winners.data.length ? winners.data.filter(data => [...STATES, '--'].includes(data.state)) : []), [winners]);
 
-  const formatCell = useCallback((value: any, columnKey: any, state: string): JSX.Element => {
-    if (columnKey === "percentage") {
+  const formatCell = useCallback((value: string | number, columnKey: string, state: string): React.ReactNode => {
+    if (columnKey === PercentageColumnKey && typeof value === 'number') {
       return (
         <span data-testid={`percentageCell-${state}`}>
           {value.toFixed(2)}%
         </span>
       );
     }
-    if (columnKey === "totalWinners") {
+    if (columnKey === TotalWinnersColumnKey && typeof value === 'number') {
       return (
         <span data-testid={`totalWinnersCell-${state}`}>
           {new Intl.NumberFormat("en-US").format(value)}
@@ -47,7 +47,7 @@ export const WinnersTable: React.FC<WinnersTableProps> = ({winners}) => {
               const value = getKeyValue(item, columnKey);
               return (
                 <TableCell className="align-middle text-center py-2">
-                  {formatCell(value, columnKey, item.state)}
+                  {formatCell(value, String(columnKey), item.state)}
                 </TableCell>
               )
             }}

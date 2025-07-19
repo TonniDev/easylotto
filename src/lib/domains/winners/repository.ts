@@ -14,7 +14,7 @@ export class WinnersRepository implements IWinnersRepository {
   constructor(private readonly networkService: AxiosService<
     Winners,
     undefined,
-    Record<string, any>
+    Record<string, string | number | boolean | undefined>
   >) {
     this.networkService = networkService;
   }

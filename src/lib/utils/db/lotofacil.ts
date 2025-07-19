@@ -1,6 +1,6 @@
 import {Lotofacil, mapFaixaStringToEFaixa} from "@lib/definitions/lotofacil";
 import {prisma} from "@lib/prisma";
-import {generateKeyByAttributesCount, upsertStatistics} from "@lib/utils/cron/helpers";
+import {upsertStatistics} from "@lib/utils/cron/helpers";
 
 export interface CreateLotofacilReturn {
   id: string | null;
@@ -94,7 +94,7 @@ export async function upsertStatistic(key: string, gameNumber: number) {
         games: [String(gameNumber)],
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     throw error;
   }
 }
@@ -114,7 +114,8 @@ export async function createLotofacil(itemData: Lotofacil): Promise<CreateLotofa
       statistics,
       error: null,
     }
-  } catch (error: any) {
-    throw { id: null, gameNumber: itemData.numero, error: error.message };
+  } catch (err: unknown) {
+    const error = err as Error;
+    throw { id: null, gameNumber: itemData.numero, error: error.message || 'Unknown error' };
   }
 }

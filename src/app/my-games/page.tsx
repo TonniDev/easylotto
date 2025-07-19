@@ -8,6 +8,13 @@ import { fetchSavedGames } from "@lib/utils/fetchSavedGames";
 import { SavedGamesParams } from "@lib/domains/userGames/repository";
 import { GeneratedGameCard } from "../generator/components/GeneratedGameCard";
 
+interface SavedGame {
+  id: string;
+  email: string;
+  name: string;
+  listaDezenas: string[];
+}
+
 // Simple debounce function
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -32,7 +39,7 @@ export default function MyGamesPage() {
   const nameParam = params.get('name') || undefined;
   const [email, setEmail] = useState<string>(emailParam || "");
   const [name, setName] = useState<string>(nameParam || "");
-  const [savedGames, setSavedGames] = useState<any[]>([]);
+  const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
   const [allGames, setAllGames] = useState<string[][] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,10 +59,11 @@ export default function MyGamesPage() {
   // Debounce the input values
   const debouncedEmail = useDebounce(email, 500);
   const debouncedName = useDebounce(name, 500);
-  const fetchAllGames = async () => {
+
+  const fetchAllGames = useCallback(async () => {
     const all = await fetchLotofacilAllGames()
     setAllGames(all);
-  };
+  }, []);
 
   // Fetch saved games when debounced inputs change
   const fetchGames = useCallback(async () => {
@@ -86,7 +94,7 @@ export default function MyGamesPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedEmail, debouncedName, router, fetchSavedGames]);
+  }, [debouncedEmail, debouncedName, router]);
 
   useEffect(() => {
     if (emailParam !== undefined && emailParam !== email) {
@@ -95,7 +103,7 @@ export default function MyGamesPage() {
     if (nameParam !== undefined && nameParam !== name) {
       setName(nameParam);
     }
-  }, []);
+  }, [email, emailParam, name, nameParam]);
 
   useEffect(() => {
     void fetchGames();
@@ -112,7 +120,7 @@ export default function MyGamesPage() {
   useEffect(() => {
     // If we have URL parameters, fetch games directly
     if (emailParam !== undefined || nameParam !== undefined) {
-      let newParams: Record<string, string> = {};
+      const newParams: Record<string, string> = {};
       if (emailParam !== undefined) {
         newParams['email'] = emailParam;
       }
@@ -121,7 +129,7 @@ export default function MyGamesPage() {
       }
       fetchSavedGames(newParams).then(setSavedGames);
     }
-  }, [emailParam, nameParam, email, name, fetchSavedGames]);
+  }, [emailParam, nameParam, email, name]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -177,7 +185,7 @@ export default function MyGamesPage() {
                 <p className="text-sm text-gray-300 mb-4">Name: {game.name}</p>
                 {Array.isArray(game.listaDezenas) && game.listaDezenas.length > 0 && allGames ? (
                   <GeneratedGameCard
-                    set={game.listaDezenas.map(n => parseInt(n))}
+                    set={game.listaDezenas.map((n: string) => parseInt(n))}
                     index={index}
                     selectedGames={selectedGames}
                     toggleGameSelection={toggleGameSelection}

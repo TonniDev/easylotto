@@ -1,10 +1,10 @@
 function convertToNumber(item: number | string): number {
-  let num = typeof item === 'string' ? Number(item) : item;
+  const num = typeof item === 'string' ? Number(item) : item;
   if (Number.isNaN(num)) throw new Error(`Invalid number: received ${item}`);
   return num;
 }
 export function isPrime(item: number | string): boolean {
-  let num = convertToNumber(item);
+  const num = convertToNumber(item);
   if (num <= 1) return false;
   if (num <= 3) return true;
   if (num % 2 === 0 || num % 3 === 0) return false;
@@ -15,7 +15,7 @@ export function isPrime(item: number | string): boolean {
 }
 
 export function isFibonacci(item: number | string): boolean {
-  let num = convertToNumber(item);
+  const num = convertToNumber(item);
   if (num <= 1) return num === 0 || num === 1;
   let a = 0,
     b = 1;
@@ -26,17 +26,17 @@ export function isFibonacci(item: number | string): boolean {
 }
 
 export function isOdd(item: number | string): boolean {
-  let num = convertToNumber(item);
+  const num = convertToNumber(item);
   return num % 2 !== 0;
 }
 
 export function isEven(item: number | string): boolean {
-  let num = convertToNumber(item);
+  const num = convertToNumber(item);
   return num % 2 === 0;
 }
 
 export function isMultipleOf3(item: number | string): boolean {
-  let num = convertToNumber(item);
+  const num = convertToNumber(item);
   return num % 3 === 0;
 }
 

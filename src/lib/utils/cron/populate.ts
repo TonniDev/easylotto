@@ -23,7 +23,6 @@ Sentry.init({
 const args = minimist(process.argv.slice(2));
 let currentId = args.item ? parseInt(args.item, 10) : 1;
 const throttle = args.throttle ? parseInt(args.throttle, 10) : 1;
-let itemsToRun = args.items ? args.items : undefined;
 const retries = args.retries ? args.retries : 3;
 const cronExpression = throttle === 1 ? '* * * * * *' : `*/${throttle} * * * * *`;
 
@@ -60,12 +59,13 @@ async function startCronJob() {
         const savedItem = await processItem(currentId);
         logger.info(`Item ${savedItem.gameNumber} inserted successfully with id ${savedItem.id}.`);
         currentId++;
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as { id?: number; error?: string };
         logger.error(`
           Job stopped.
           Last successful item: ${currentId - 1}.
-          Failed at item ${err.id}.
-          Error: ${err.error}
+          Failed at item ${error.id || 'unknown'}.
+          Error: ${error.error || 'unknown error'}
         `);
         Sentry.captureException(err);
         process.exit(1);
@@ -77,8 +77,9 @@ async function startCronJob() {
     logger.info(
       `Cron job started. Requesting every ${throttle} second(s), starting from item ${currentId}...`
     );
-  } catch (error: any) {
-    logger.error(`Failed to initialize the job. Error: ${error.message}`);
+  } catch (err: unknown) {
+    const error = err as Error;
+    logger.error(`Failed to initialize the job. Error: ${error.message || 'unknown error'}`);
     Sentry.captureException(error);
     process.exit(1);
   }

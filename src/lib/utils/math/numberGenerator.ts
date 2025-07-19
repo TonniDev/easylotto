@@ -6,7 +6,7 @@ import {
   GetEvenOrOddNumbersFromXToY, PossibleConstraints
 } from "@lib/utils/math/types";
 
-function getEvenOrOddNumbersFromXToY({ range: [start, end] = [1, 25], type = 'even' }: GetEvenOrOddNumbersFromXToY): number[] {
+export function getEvenOrOddNumbersFromXToY({ range: [start, end] = [1, 25], type = 'even' }: GetEvenOrOddNumbersFromXToY): number[] {
   if (start > end) {
     throw new Error("Invalid range: 'start' must be less than or equal to 'end'");
   }
@@ -196,11 +196,7 @@ function fillRemainingNumbers({
     rangeLimit 
   });
 
-  let amountOfNumbers = numbers.length;
-
-  const evenNumbers = getEvenOrOddNumbersFromXToY({range: [1, rangeLimit], type: "even"});
   const existingEven = Array.from(numbers).filter(isEven);
-  const oddNumbers = getEvenOrOddNumbersFromXToY({range: [1, rangeLimit], type: "odd"});
   const existingOdd = Array.from(numbers).filter(isOdd);
 
   console.log('fillRemainingNumbers - Current counts:', {
@@ -243,7 +239,6 @@ function fillRemainingNumbers({
 
   // Create a copy of the numbers array to avoid modifying the original
   const resultNumbers = [...numbers];
-  let amountToBeAdded = setLimit - resultNumbers.length;
 
   // Add a safety counter to prevent infinite loops
   let safetyCounter = 0;

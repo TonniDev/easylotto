@@ -41,7 +41,7 @@ async function processItem(number: number): Promise<CreateLotofacilReturn> {
 }
 
 async function handler(): Promise<void> {
-  
+
   const lastLotteryGame = await getLastLotofacilLotteryGame();
 
   const lastItemSaved = await prisma.loterias.findFirst({
@@ -54,7 +54,7 @@ async function handler(): Promise<void> {
     logger.warn('No items saved yet. You need to populate the database first.');
     process.exit(0);
   }
-  
+
   const missingGames = lastLotteryGame - (lastItemSaved?.numero ?? 0);
 
   const totalItems = (() => {
@@ -90,12 +90,13 @@ async function handler(): Promise<void> {
           `Item ${savedItem.gameNumber} inserted successfully with id ${savedItem.id}.`
         );
 
-      } catch (error: any) {
+      } catch (err: unknown) {
+        const error = err as { id?: number; error?: string };
         logger.error(`
             Job stopped.
             Last successful item: ${currentId - 1}.
-            Failed at item ${error.id}.
-            Error: ${error.error}
+            Failed at item ${error.id || 'unknown'}.
+            Error: ${error.error || 'unknown error'}
           `);
         Sentry.captureException(error);
         process.exit(1);
@@ -116,8 +117,9 @@ async function handler(): Promise<void> {
 async function startCronJob() {
   try {
     await handler();
-  } catch (error: any) {
-    logger.error(`Failed to initialize the job. Error: ${error.message}`);
+  } catch (err: unknown) {
+    const error = err as Error;
+    logger.error(`Failed to initialize the job. Error: ${error.message || 'unknown error'}`);
     Sentry.captureException(error);
     process.exit(1);
   }

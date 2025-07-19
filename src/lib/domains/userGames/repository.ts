@@ -1,5 +1,4 @@
 import {AxiosService} from "@lib/Network/AxiosService";
-import {prisma} from "@lib/prisma";
 
 export interface SaveGameData {
   email: string;
@@ -16,7 +15,14 @@ export interface SaveGameResult {
     name: string;
     numbers: string[];
   }>;
-  error?: any;
+  error?: Error | unknown;
+}
+
+export interface SavedGame {
+  id: string;
+  email: string;
+  name: string;
+  listaDezenas: string[];
 }
 
 export interface SavedGamesParams {
@@ -26,7 +32,7 @@ export interface SavedGamesParams {
 
 export interface IUserGamesRepository {
   saveGames(data: SaveGameData): Promise<SaveGameData[]>;
-  getGamesByEmail(params?: SavedGamesParams): Promise<any>;
+  getGamesByEmail(params?: SavedGamesParams): Promise<SavedGame[]>;
 }
 
 export class UserGamesRepository implements IUserGamesRepository {
@@ -48,7 +54,7 @@ export class UserGamesRepository implements IUserGamesRepository {
     return response.data;
   }
 
-  async getGamesByEmail(params?: {email?: string; name?: string}): Promise<any> {
+  async getGamesByEmail(params?: {email?: string; name?: string}): Promise<SavedGame[]> {
     const {email, name} = params || {};
     let paramsString = '';
     if (email) {

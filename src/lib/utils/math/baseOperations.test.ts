@@ -1,7 +1,7 @@
 import {
   addNumbersToList,
   countNumbersByCondition,
-  getFibonacciNumbersUpToX, getMultiplesOf3UpToX,
+  getFibonacciNumbersUpToX,
   getPrimeNumbersUpToX
 } from "@lib/utils/math/numberGenerator";
 import {isPrime, isFibonacci, isMultipleOf3, isOdd, isEven} from './baseOperations';
@@ -28,7 +28,7 @@ describe("Math utils", () => {
     expect(allNotPrimes).toBeTruthy();
     expect(filteredPrimeNumbers).toHaveLength(primeNumbersListTo100.length)
   });
-  
+
   it('Returns true for Fibonacci numbers when checking with isFibonacci', () => {
     const fibonacciSequenceFrom0To100: number[] = [
       0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89
@@ -44,7 +44,7 @@ describe("Math utils", () => {
     expect(allNotFibonacciNumbers).toBeTruthy();
     expect(filteredFibonacciNumbers).toHaveLength(fibonacciSequenceFrom0To100.length - 1);
   });
-  
+
   it('Returns true for multiples of 3 when checking with isMultipleOf3', () => {
     const multiplesOf3From0To100: number[] = [
       0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54,

@@ -170,7 +170,7 @@ export function getAllPossibleConstraintCombinations(
 
   // For pagination, we'll use a more efficient approach
   // We'll generate combinations incrementally until we reach the desired page
-  let results: Constraints[] = [];
+  const results: Constraints[] = [];
   let count = 0;
   let foundCombinations = 0;
 

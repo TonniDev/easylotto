@@ -1,6 +1,6 @@
 import {axiosInstance as serviceClient} from "@lib/Network/axios.instance";
 import {INetworkService, IRequestConfig} from "@lib/Network/types";
-import {AxiosHeaders, AxiosRequestHeaders, AxiosRequestConfig, AxiosResponse} from "axios";
+import {AxiosHeaders, AxiosRequestHeaders, AxiosResponse} from "axios";
 
 export class AxiosService<ResponseType, PayloadFormat, ParamsFormat, ResponseFormat = AxiosResponse<ResponseType>> implements INetworkService<ResponseFormat, PayloadFormat, ParamsFormat> {
 

@@ -89,7 +89,7 @@ export function mockFromSchema<T>(
 
   if (schema instanceof ZodObject) {
     const shape = schema.shape;
-    const result: any = {};
+    const result: Record<string, unknown> = {};
     for (const key in shape) {
       result[key] = mockFromSchema(shape[key] as ZodTypeAny);
     }

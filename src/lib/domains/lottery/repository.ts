@@ -1,7 +1,6 @@
 import {Lotofacil} from "@lib/definitions/lotofacil";
 import {AxiosService} from "@lib/Network/AxiosService";
-import {INetworkService, IRequestConfig} from "@lib/Network/types";
-import {GenerateRandomSetsOptions} from "@lib/utils/math/types";
+import {IRequestConfig} from "@lib/Network/types";
 import {AxiosResponse} from "axios";
 
 export interface GetHistoricalDataPayload {
@@ -27,9 +26,9 @@ export class LotteryRepository implements ILotteryRepository {
   GAMES_URL = '/games';
 
   constructor(private readonly networkService: AxiosService<
-    Lotofacil,
+    Lotofacil | string[][],
     GetHistoricalDataPayload,
-    Record<string, any>
+    Record<string, string | number | boolean | undefined>
   >) {
     this.networkService = networkService;
   }
@@ -41,7 +40,7 @@ export class LotteryRepository implements ILotteryRepository {
   async getItem(config?: IRequestConfig<GetItemPayload>): Promise<Lotofacil> {
     const {data, ...requestConfig} = config || {};
     const gameNumber = data?.number || '';
-    const response = await this.networkService.get(`${this.LOTOFACIL_URL}/${gameNumber || ''}`, {
+    const response = await this.networkService.get<AxiosResponse<Lotofacil>>(`${this.LOTOFACIL_URL}/${gameNumber || ''}`, {
       baseURL: this.BASE_URL,
       ...requestConfig
     });
@@ -66,7 +65,7 @@ export class LotteryRepository implements ILotteryRepository {
         return accumulatedResults;
       }
 
-      const request = this.networkService.get(
+      const request = this.networkService.get<AxiosResponse<Lotofacil>>(
         `${this.LOTOFACIL_URL}/${start}`,
         {
           baseURL: this.BASE_URL,
@@ -75,7 +74,7 @@ export class LotteryRepository implements ILotteryRepository {
       );
 
       try {
-        const response: AxiosResponse<Lotofacil> = await request;
+        const response = await request;
 
         // Add response data to the result array
         accumulatedResults.push(response.data);
@@ -89,7 +88,7 @@ export class LotteryRepository implements ILotteryRepository {
         console.log('@tonni ERROR: ', e, request);
         throw e;
       }
-      // Send request for the current item
+      // Send a request for the current item
     };
 
     // Start recursive fetching
@@ -97,13 +96,13 @@ export class LotteryRepository implements ILotteryRepository {
   }
 
   async getLotofacilHistoricalGamesNumbersOnly(): Promise<string[][]> {
-    const results = await this.networkService.get("/lottery/lotofacil");
+    const results = await this.networkService.get<AxiosResponse<string[][]>>("/lottery/lotofacil");
 
     return results.data;
   }
 
   /** TODO: Create a different repository for this method for proper typing */
-  async generateNumbers(payload: GenerateRandomSetsOptions) {
+  async generateNumbers(payload: GetHistoricalDataPayload) {
     const results = await this.networkService.post(`${this.GAMES_URL}/generate`, {
       data: payload
     });

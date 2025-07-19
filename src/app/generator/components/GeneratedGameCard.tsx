@@ -45,7 +45,7 @@ const analyzeNumberSet = (set: number[], sourceData: string[][]) => {
   );
   const fibonacciCount = countNumbersByCondition(set, isFibonacci);
 
-  const initialMatchingSets = { 15: [], 14: [], 13: [], 12: [], 11: [] };
+  const initialMatchingSets = {15: [], 14: [], 13: [], 12: [], 11: []};
   const matchingSets = sourceData.reduce<Record<string, number[]>>(
     (acc, sourceSet, index) => getMatchingSetsCount(set, sourceSet.map(item => Number(item)), index, acc),
     initialMatchingSets
@@ -153,7 +153,9 @@ export const GeneratedGameCard = ({
           <DrawerBody>
             <div className="p-4">
               <h3 className="text-xl font-bold mb-4">Game Information</h3>
-                {Object.entries(analysis.matchingSets).sort(([scoreA],[scoreB]) => scoreB - scoreA).map(([score, sets]) => {
+              {Object.entries(analysis.matchingSets)
+                .sort(([scoreA], [scoreB]) => Number(scoreB) - Number(scoreA))
+                .map(([score, sets]) => {
                   const limit = score === "11" ? 3000 : score === "12" ? 2000 : 0;
                   return (
                     <p key={score} className="p-2">
@@ -161,12 +163,14 @@ export const GeneratedGameCard = ({
                     </p>
                   )
                 })}
-              <p className="mb-2">In the future, this drawer will contain more comprehensive statistics and analysis of this game.</p>
+              <p className="mb-2">In the future, this drawer will contain more comprehensive statistics and analysis of
+                this game.</p>
               <div className="mt-4">
                 <h4 className="text-lg font-semibold mb-2">Game Numbers</h4>
                 <div className="flex flex-wrap gap-2">
                   {set.map((number, idx) => (
-                    <div key={idx} className="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center font-medium">
+                    <div key={idx}
+                         className="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center font-medium">
                       {number}
                     </div>
                   ))}

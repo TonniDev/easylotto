@@ -4,7 +4,6 @@ import {AxiosService} from "@lib/Network/AxiosService";
 import {upsertStatistic} from "@lib/utils/db/lotofacil";
 import {isEven, isFibonacci, isMultipleOf3, isOdd, isPrime} from "@lib/utils/math/baseOperations";
 import {countNumbersByCondition} from "@lib/utils/math/numberGenerator";
-import {GenerateRandomSetsOptions} from "@lib/utils/math/types";
 import {AxiosError} from "axios";
 import {setTimeout as delay} from 'node:timers/promises';
 import createLogger from "@lib/utils/logger";
@@ -57,10 +56,11 @@ export async function fetchItemWithRetries(number: number, retries: number): Pro
   while (attempt <= retries) {
     try {
       return await repository.getItem({data: {number}});
-    } catch (err: any) {
-      if (isTransientError(err)) {
+    } catch (err: unknown) {
+      const error = err as Error;
+      if (err instanceof AxiosError && isTransientError(err)) {
         logger.warn(
-          `Transient error on item ${number} (attempt ${attempt}/${retries}): ${err.message}`
+          `Transient error on item ${number} (attempt ${attempt}/${retries}): ${error.message}`
         );
         lastError = err;
 
@@ -68,7 +68,7 @@ export async function fetchItemWithRetries(number: number, retries: number): Pro
           await delay(RETRY_DELAY_MS);
         }
       } else {
-        logger.error(`Non-transient error on item ${number}: ${err.message}`);
+        logger.error(`Non-transient error on item ${number}: ${error.message}`);
         throw err;
       }
     }
@@ -99,7 +99,7 @@ export function generateKeyByAttributesCount(list: (number | string)[]): string[
 export async function upsertStatistics(lotteryNumbers: string[], gameNumber: number) {
   try {
     const statistics = generateKeyByAttributesCount(lotteryNumbers);
-    let savedStats = [];
+    const savedStats = [];
     for (const key of statistics) {
       logger.info(`Processing statistic ${key}...`);
       const savedStat = await upsertStatistic(key, gameNumber);
