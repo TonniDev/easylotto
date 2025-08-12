@@ -24,6 +24,7 @@ const navigationItems = [
   { name: "Math Explorer", href: "/possible-combinations" },
   { name: "Winners", href: "/winners-per-state" },
   { name: "Risk Calculator", href: "/education/multi-game-calculator" },
+  { name: "Myth Buster", href: "/education/common-misconceptions" },
 ];
 
 export function Navigation() {
