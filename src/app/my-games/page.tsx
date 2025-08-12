@@ -5,13 +5,15 @@ import {useRouter, useSearchParams} from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { Input } from "@heroui/react";
 import { fetchSavedGames } from "@lib/utils/fetchSavedGames";
-import { SavedGamesParams } from "@lib/domains/userGames/repository";
+import { SavedGamesParams, SavedGame as SavedGameType } from "@lib/domains/userGames/repository";
 import { GeneratedGameCard } from "../generator/components/GeneratedGameCard";
+import { useAuth } from "@ui/providers/AuthProvider";
 
 interface SavedGame {
   id: string;
   email: string;
   name: string;
+  group?: string;
   listaDezenas: string[];
 }
 
@@ -35,10 +37,9 @@ function useDebounce<T>(value: T, delay: number): T {
 export default function MyGamesPage() {
   const router = useRouter();
   const params = useSearchParams();
-  const emailParam = params.get('email') || undefined;
-  const nameParam = params.get('name') || undefined;
-  const [email, setEmail] = useState<string>(emailParam || "");
-  const [name, setName] = useState<string>(nameParam || "");
+  const { getAuthHeaders } = useAuth();
+  const groupParam = params.get('group') || undefined;
+  const [group, setGroup] = useState<string>(groupParam || "");
   const [savedGames, setSavedGames] = useState<SavedGame[]>([]);
   const [allGames, setAllGames] = useState<string[][] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,54 +57,55 @@ export default function MyGamesPage() {
     });
   };
 
-  // Debounce the input values
-  const debouncedEmail = useDebounce(email, 500);
-  const debouncedName = useDebounce(name, 500);
+  // Debounce the group input
+  const debouncedGroup = useDebounce(group, 500);
 
   const fetchAllGames = useCallback(async () => {
     const all = await fetchLotofacilAllGames()
     setAllGames(all);
   }, []);
 
-  // Fetch saved games when debounced inputs change
+  // Fetch saved games when debounced group changes
   const fetchGames = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const params: SavedGamesParams = {};
-      if (debouncedEmail) params.email = debouncedEmail;
-      if (debouncedName) params.name = debouncedName;
-
-      // Construct URL with only defined parameters
+      // Construct URL with group parameter if provided
       let url = '/my-games';
-      const queryParams = [];
-      if (params.email !== undefined) queryParams.push(`email=${params.email}`);
-      if (params.name !== undefined) queryParams.push(`name=${params.name}`);
-      if (queryParams.length > 0) {
-        url += '?' + queryParams.join('&');
+      if (debouncedGroup) {
+        url += `?group=${debouncedGroup}`;
       }
       router.push(url);
 
-      // Fetch saved games with the same parameters
-      const result = await fetchSavedGames(params);
-      setSavedGames(result || []);
+      // Fetch saved games with authentication headers
+      const response = await fetch(`/api/v1/games/saved${debouncedGroup ? `?group=${debouncedGroup}` : ''}`, {
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSavedGames(result || []);
+      } else {
+        throw new Error('Failed to fetch saved games');
+      }
     } catch (err) {
       console.error("Error fetching saved games:", err);
       setError("Failed to fetch saved games. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [debouncedEmail, debouncedName, router]);
+  }, [debouncedGroup, router, getAuthHeaders]);
 
+  // Initialize group from URL parameter
   useEffect(() => {
-    if (emailParam !== undefined && emailParam !== email) {
-      setEmail(emailParam);
+    if (groupParam !== undefined) {
+      setGroup(groupParam);
     }
-    if (nameParam !== undefined && nameParam !== name) {
-      setName(nameParam);
-    }
-  }, [email, emailParam, name, nameParam]);
+  }, [groupParam]);
 
   useEffect(() => {
     void fetchGames();
@@ -115,51 +117,22 @@ export default function MyGamesPage() {
     }
   }, [allGames, fetchAllGames]);
 
-  // This useEffect runs when URL parameters change
-  // It's needed to handle direct URL navigation or page refresh
-  useEffect(() => {
-    // If we have URL parameters, fetch games directly
-    if (emailParam !== undefined || nameParam !== undefined) {
-      const newParams: Record<string, string> = {};
-      if (emailParam !== undefined) {
-        newParams['email'] = emailParam;
-      }
-      if (nameParam !== undefined) {
-        newParams['name'] = nameParam;
-      }
-      fetchSavedGames(newParams).then(setSavedGames);
-    }
-  }, [emailParam, nameParam, email, name]);
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">My Saved Games</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Search by email"
-          />
-        </div>
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium mb-1">
-            Name
-          </label>
-          <Input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Search by name"
-          />
-        </div>
+      <div className="mb-8 max-w-md">
+        <label htmlFor="group" className="block text-sm font-medium mb-2">
+          Filter by Group
+        </label>
+        <Input
+          id="group"
+          type="text"
+          value={group}
+          onChange={(e) => setGroup(e.target.value)}
+          placeholder="Search by group (optional)"
+          className="w-full"
+        />
       </div>
 
       {loading && <div className="text-center py-4">Loading...</div>}
@@ -182,7 +155,9 @@ export default function MyGamesPage() {
             {savedGames.map((game, index) => (
               <li key={game.id} className="p-4 hover:bg-gray-700 max-w-[300px]">
                 <p className="font-medium text-white">{game.email}</p>
-                <p className="text-sm text-gray-300 mb-4">Name: {game.name}</p>
+                <p className="text-sm text-gray-300">Name: {game.name}</p>
+                {game.group && <p className="text-sm text-gray-300 mb-4">Group: {game.group}</p>}
+                {!game.group && <div className="mb-4"></div>}
                 {Array.isArray(game.listaDezenas) && game.listaDezenas.length > 0 && allGames ? (
                   <GeneratedGameCard
                     set={game.listaDezenas.map((n: string) => parseInt(n))}

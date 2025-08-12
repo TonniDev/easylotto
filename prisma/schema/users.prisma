@@ -1,0 +1,28 @@
+model users {
+  id            String          @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email         String          @unique @db.VarChar(255)
+  password_hash String          @db.VarChar(255)
+  first_name    String          @db.VarChar(100)
+  is_active     Boolean         @default(true)
+  created       DateTime        @default(now())
+  modified      DateTime        @updatedAt
+  saved_games   saved_games[]
+  sessions      user_sessions[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model user_sessions {
+  id            String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id       String   @db.Uuid
+  session_token String   @unique @db.VarChar(255)
+  expires_at    DateTime
+  created       DateTime @default(now())
+  user          users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([session_token])
+  @@index([expires_at])
+  @@map("user_sessions")
+}

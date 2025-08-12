@@ -1,9 +1,9 @@
 "use client";
 
 import {Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure} from "@heroui/react";
-import {saveGames} from "@lib/utils/saveGames";
 import {useState} from "react";
 import {GeneratedGameCard} from "./GeneratedGameCard";
+import { useAuth } from "@ui/providers/AuthProvider";
 
 interface GeneratedNumbersProps {
   generatedNumbers: number[][] | null;
@@ -11,9 +11,9 @@ interface GeneratedNumbersProps {
 }
 
 export const GeneratedNumbers = ({generatedNumbers, sourceData}: GeneratedNumbersProps) => {
+  const { getAuthHeaders } = useAuth();
   const [selectedGames, setSelectedGames] = useState<number[]>([]);
-  const [email, setEmail] = useState<string>("");
-  const [name, setName] = useState<string>("");
+  const [groupName, setGroupName] = useState<string>("");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [saveResult, setSaveResult] = useState<{ success: boolean; message: string } | null>(null);
 
@@ -41,31 +41,41 @@ export const GeneratedNumbers = ({generatedNumbers, sourceData}: GeneratedNumber
 
   // Function to handle save confirmation
   const handleSaveConfirm = async () => {
-    if (!email || !name) {
-      setSaveResult({
-        success: false,
-        message: "Email and name are required"
-      });
-      return;
-    }
-
     setIsSaving(true);
 
     try {
       // Get the selected number sets
       const selectedNumberSets = selectedGames.map(index => generatedNumbers[index]);
 
-      // Call the API to save the games
-      const result = await saveGames({
-        email,
-        name,
-        numbers: selectedNumberSets,
+      // Call the API to save the games with authentication
+      const response = await fetch('/api/v1/games/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders(),
+        },
+        body: JSON.stringify({
+          numbers: selectedNumberSets,
+          group: groupName || undefined,
+        }),
       });
 
-      setSaveResult({
-        success: true,
-        message: `Successfully saved ${result.length} game(s).`
-      });
+      const result = await response.json();
+
+      if (result.success) {
+        setSaveResult({
+          success: true,
+          message: result.message
+        });
+        // Clear selections after successful save
+        setSelectedGames([]);
+        setGroupName("");
+      } else {
+        setSaveResult({
+          success: false,
+          message: result.message || "Failed to save games"
+        });
+      }
     } catch (error) {
       console.error("Error saving games:", error);
       setSaveResult({
@@ -136,31 +146,23 @@ export const GeneratedNumbers = ({generatedNumbers, sourceData}: GeneratedNumber
           <ModalHeader>Save Selected Games</ModalHeader>
           <ModalBody>
             <div className="space-y-4">
+              <p className="text-foreground/70">
+                You are about to save {selectedGames.length} game(s) to your account.
+              </p>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email <span className="text-red-500">*</span>
+                <label htmlFor="groupName" className="block text-sm font-medium mb-1">
+                  Group Name (Optional)
                 </label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
-                  Name for this set <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  id="name"
+                  id="groupName"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Give a name to these games"
-                  required
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  placeholder="Enter a group name to organize these games"
                 />
+                <p className="text-xs text-foreground/60 mt-1">
+                  Group names help you organize and filter your saved games later.
+                </p>
               </div>
             </div>
           </ModalBody>
@@ -173,7 +175,7 @@ export const GeneratedNumbers = ({generatedNumbers, sourceData}: GeneratedNumber
               onPress={handleSaveConfirm}
               isLoading={isSaving}
             >
-              Save
+              Save Games
             </Button>
           </ModalFooter>
         </ModalContent>

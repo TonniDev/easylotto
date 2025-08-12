@@ -1,37 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SaveGameData, SaveGameResult } from "@lib/domains/userGames/repository";
+import { SaveGameData, SaveGameResult, SavedGameResponse } from "@lib/domains/userGames/repository";
 import { prisma } from "@lib/prisma";
+import { requireAuth } from "@lib/middleware/auth";
 
-export async function POST(request: NextRequest) {
+export const POST = requireAuth(async (request) => {
   try {
     const body = await request.json();
 
     // Validate request body
-    if (!body.email || !body.name || !body.numbers || !Array.isArray(body.numbers) || body.numbers.length === 0) {
+    if (!body.numbers || !Array.isArray(body.numbers) || body.numbers.length === 0) {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: "Missing required fields: email, name, or numbers" 
+        {
+          success: false,
+          message: "Missing required field: numbers"
         },
         { status: 400 }
       );
     }
 
-    // Prepare data for saving
+    // Use authenticated user's information
     const saveData: SaveGameData = {
-      email: body.email,
-      name: body.name,
+      email: request.user!.email,
+      name: request.user!.first_name,
       numbers: body.numbers,
+      group: body.group,
     };
 
     // Save games directly using Prisma
     let result: SaveGameResult;
 
     try {
-      if (!saveData.email || !saveData.name || !saveData.numbers || saveData.numbers.length === 0) {
+      if (!saveData.numbers || saveData.numbers.length === 0) {
         result = {
           success: false,
-          message: "Missing required fields: email, name, or numbers",
+          message: "Missing required field: numbers",
         };
       } else {
         const savedGames = await Promise.all(
@@ -44,15 +46,21 @@ export async function POST(request: NextRequest) {
                 email: saveData.email,
                 name: saveData.name,
                 listaDezenas: stringNumbers,
+                group: saveData.group,
+                user_id: request.user!.id,
               },
             });
 
-            return {
+            // Map database result to API response format
+            const gameResponse: SavedGameResponse = {
               id: savedGame.id,
               email: savedGame.email,
               name: savedGame.name,
               numbers: savedGame.listaDezenas,
+              group: savedGame.group,
             };
+            
+            return gameResponse;
           })
         );
 
@@ -87,4 +95,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

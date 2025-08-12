@@ -25,6 +25,9 @@ migrations:
 migrate:
 		dotenv -e .env.local pnpm migrate:dev
 
+update:
+		dotenv -e .env.local npx tsx src/lib/utils/cron/update.ts
+
 rollback:
 		dotenv -f .env.local pnpm migrate:reset:dev
 

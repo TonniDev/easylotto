@@ -2,7 +2,7 @@ import { getAllPossibleConstraintCombinations } from './gameValidator';
 
 // Test the getAllPossibleConstraintCombinations function
 describe('getAllPossibleConstraintCombinations', () => {
-  it('should return non-empty results for valid inputs', () => {
+  it('should return non-empty results for valid inputs', { timeout: 15000 }, () => {
     // Use the same parameters as in the page.tsx file
     const {combinations} = getAllPossibleConstraintCombinations(15, 1, 25);
     

@@ -55,11 +55,14 @@ export default function GeneratorForm({statistics, onSubmit}: GeneratorFormProps
   const presetOptions = useMemo(() => {
     if (!statistics?.results) return [];
 
-    return statistics.results.map(item => ({
-      key: item.statKey,
-      label: `Preset ${item.statKey} - ${item.lastoccurrence} - ${item.value} occurrences`,
-      constraints: parseStatKey(item.statKey)
-    }));
+    return statistics.results
+      .map(item => ({
+        key: item.statKey,
+        label: `Preset ${item.statKey} - ${item.lastoccurrence} - ${item.value} occurrences`,
+        constraints: parseStatKey(item.statKey),
+        occurrences: item.value
+      }))
+      .sort((a, b) => b.occurrences - a.occurrences); // Sort by number of occurrences (descending)
   }, [statistics]);
 
   const {handleSubmit, register, setValue, watch} = useForm<LotofacilFormValues>({
