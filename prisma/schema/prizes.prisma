@@ -1,20 +1,20 @@
+model prizes {
+  id                 String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  descricao_faixa    EFaixa
+  faixa              Int
+  numeroDeGanhadores Int      @map("numero_de_ganhadores")
+  valorPremio        Decimal  @map("valor_premio") @db.Decimal(10, 2)
+  concurso           Int
+  loteria_numero     Int
+  created            DateTime @default(now())
+  modified           DateTime @updatedAt
+  loteria            loterias @relation(fields: [loteria_numero], references: [numero])
+}
+
 enum EFaixa {
   F15 @map("15 acertos")
   F14 @map("14 acertos")
   F13 @map("13 acertos")
   F12 @map("12 acertos")
   F11 @map("11 acertos")
-}
-
-model prizes {
-  id                 String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  descricao_faixa    EFaixa
-  faixa              Int      @db.Integer
-  numeroDeGanhadores Int      @map(name: "numero_de_ganhadores") @db.Integer
-  valorPremio        Decimal  @map(name: "valor_premio") @db.Decimal(10, 2)
-  concurso           Int      @db.Integer
-  loteria            loterias @relation(fields: [loteria_numero], references: [numero])
-  loteria_numero     Int      @db.Integer
-  created            DateTime @default(now())
-  modified           DateTime @updatedAt
 }

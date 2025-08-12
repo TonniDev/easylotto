@@ -1,9 +1,15 @@
 model saved_games {
   id              String   @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  listaDezenas    String[] @map(name: "lista_dezenas") @db.Text
-  email           String   @db.VarChar()
-  name            String   @db.VarChar()
-  winning_lottery Int?     @db.Integer
+  listaDezenas    String[] @map("lista_dezenas")
+  email           String   @db.VarChar
   created         DateTime @default(now())
   modified        DateTime @updatedAt
+  name            String   @db.VarChar
+  winning_lottery Int?
+  group           String?  @db.VarChar
+  user_id         String?  @db.Uuid
+  user            users?   @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([email])
 }
