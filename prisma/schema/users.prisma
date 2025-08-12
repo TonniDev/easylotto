@@ -1,13 +1,18 @@
 model users {
-  id            String          @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email         String          @unique @db.VarChar(255)
-  password_hash String          @db.VarChar(255)
-  first_name    String          @db.VarChar(100)
-  is_active     Boolean         @default(true)
-  created       DateTime        @default(now())
-  modified      DateTime        @updatedAt
-  saved_games   saved_games[]
-  sessions      user_sessions[]
+  id                    String                  @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email                 String                  @unique @db.VarChar(255)
+  password_hash         String                  @db.VarChar(255)
+  first_name            String                  @db.VarChar(100)
+  is_active             Boolean                 @default(true)
+  created               DateTime                @default(now())
+  modified              DateTime                @updatedAt
+  saved_games           saved_games[]
+  sessions              user_sessions[]
+  spending              user_spending[]
+  spending_goals        spending_goals[]
+  spending_insights     spending_insights[]
+  investment_scenarios  investment_scenarios[]
+  spending_reports      spending_reports[]
 
   @@index([email])
   @@map("users")

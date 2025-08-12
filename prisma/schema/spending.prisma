@@ -1,0 +1,98 @@
+// Spending tracking models for Risk Assessment Dashboard
+
+model user_spending {
+  id          String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id     String   @db.Uuid
+  amount      Decimal  @db.Decimal(10, 2)
+  date        DateTime @db.Date
+  category    String   @db.VarChar(50) // 'lottery', 'investment', 'other'
+  description String?  @db.VarChar(255)
+  game_type   String?  @db.VarChar(50) // 'lotofacil', 'mega_sena', etc.
+  games_count Int?     // Number of games played in this transaction
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  user        users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([date])
+  @@index([category])
+  @@index([user_id, date])
+  @@index([user_id, category])
+  @@map("user_spending")
+}
+
+model spending_goals {
+  id              String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String   @db.Uuid
+  goal_type       String   @db.VarChar(50) // 'weekly', 'monthly', 'yearly'
+  amount_limit    Decimal  @db.Decimal(10, 2)
+  category        String   @db.VarChar(50) // 'lottery', 'total'
+  is_active       Boolean  @default(true)
+  warning_enabled Boolean  @default(true)
+  warning_threshold Decimal @db.Decimal(3, 2) // 0.80 = 80% of limit
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  user            users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([user_id, is_active])
+  @@map("spending_goals")
+}
+
+model spending_insights {
+  id                String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id           String   @db.Uuid
+  insight_type      String   @db.VarChar(50) // 'opportunity_cost', 'trend_warning', 'milestone'
+  title             String   @db.VarChar(255)
+  message           String   @db.Text
+  severity          String   @db.VarChar(20) // 'info', 'warning', 'danger'
+  data_snapshot     Json?    // Store calculation data for the insight
+  is_read           Boolean  @default(false)
+  is_dismissed      Boolean  @default(false)
+  expires_at        DateTime?
+  created_at        DateTime @default(now())
+  user              users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([user_id, is_read])
+  @@index([user_id, severity])
+  @@index([expires_at])
+  @@map("spending_insights")
+}
+
+model investment_scenarios {
+  id                  String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id             String   @db.Uuid
+  scenario_name       String   @db.VarChar(100)
+  monthly_amount      Decimal  @db.Decimal(10, 2)
+  annual_return_rate  Decimal  @db.Decimal(5, 4) // 0.0800 = 8%
+  time_horizon_years  Int
+  calculated_result   Json     // Store the full calculation result
+  is_favorite         Boolean  @default(false)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  user                users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([user_id, is_favorite])
+  @@map("investment_scenarios")
+}
+
+model spending_reports {
+  id              String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String   @db.Uuid
+  report_type     String   @db.VarChar(50) // 'weekly', 'monthly', 'yearly', 'custom'
+  period_start    DateTime @db.Date
+  period_end      DateTime @db.Date
+  total_spending  Decimal  @db.Decimal(10, 2)
+  lottery_spending Decimal @db.Decimal(10, 2)
+  opportunity_cost Decimal @db.Decimal(10, 2)
+  report_data     Json     // Detailed breakdown and calculations
+  generated_at    DateTime @default(now())
+  user            users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([user_id, period_start, period_end])
+  @@index([report_type])
+  @@map("spending_reports")
+}
