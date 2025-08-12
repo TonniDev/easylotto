@@ -27,45 +27,29 @@ export function calculateWinningProbability(totalGames: number): {
 } {
   const singleGameOdds = new BigNumber(1).dividedBy(LOTOFACIL_CONSTANTS.WINNING_ODDS);
 
-  // For large numbers of games, use approximation to avoid overflow
-  if (totalGames > 100000) {
-    // Use approximation: P(never winning) ≈ e^(-n*p)
-    // Since we can't use e^x directly, we'll use the series expansion for small values
-    const np = singleGameOdds.multipliedBy(totalGames);
+  // Use approximation for all cases to avoid performance issues
+  // P(never winning) ≈ e^(-n*p) where p is very small
+  const np = singleGameOdds.multipliedBy(totalGames);
 
-    // For small np, e^(-np) ≈ 1 - np + (np)^2/2 - (np)^3/6 + ...
-    // We'll use the first few terms for accuracy
-    const npSquared = np.multipliedBy(np);
-    const npCubed = npSquared.multipliedBy(np);
+  // For small np values, use Taylor series: e^(-x) ≈ 1 - x + x²/2! - x³/3! + x⁴/4!
+  const npSquared = np.multipliedBy(np);
+  const npCubed = npSquared.multipliedBy(np);
+  const npFourth = npCubed.multipliedBy(np);
 
-    const probabilityOfNeverWinning = new BigNumber(1)
-      .minus(np)
-      .plus(npSquared.dividedBy(2))
-      .minus(npCubed.dividedBy(6));
+  let probabilityOfNeverWinning = new BigNumber(1)
+    .minus(np)
+    .plus(npSquared.dividedBy(2))
+    .minus(npCubed.dividedBy(6))
+    .plus(npFourth.dividedBy(24));
 
-    // Ensure it's between 0 and 1
-    const clampedNeverWinning = BigNumber.max(0, BigNumber.min(1, probabilityOfNeverWinning));
-    const probabilityOfWinning = new BigNumber(1).minus(clampedNeverWinning);
+  // Ensure it's between 0 and 1
+  probabilityOfNeverWinning = BigNumber.max(0, BigNumber.min(1, probabilityOfNeverWinning));
+  const probabilityOfWinning = new BigNumber(1).minus(probabilityOfNeverWinning);
 
-    return {
-      probabilityOfWinning,
-      probabilityOfNeverWinning: clampedNeverWinning,
-    };
-  } else {
-    // For smaller numbers, use exact calculation
-    const probabilityOfNotWinning = new BigNumber(1).minus(singleGameOdds);
-
-    // P(never winning) = (1 - 1/3,268,760)^totalGames
-    const probabilityOfNeverWinning = probabilityOfNotWinning.exponentiatedBy(totalGames);
-
-    // P(at least one win) = 1 - P(never winning)
-    const probabilityOfWinning = new BigNumber(1).minus(probabilityOfNeverWinning);
-
-    return {
-      probabilityOfWinning,
-      probabilityOfNeverWinning,
-    };
-  }
+  return {
+    probabilityOfWinning,
+    probabilityOfNeverWinning,
+  };
 }
 
 /**
@@ -105,27 +89,39 @@ export function calculateInvestmentAlternative(
 } {
   const weeklyRate = new BigNumber(annualRate).dividedBy(52);
   const totalWeeks = years * 52;
-  
-  // Calculate final amount using annuity formula
-  const onePlusRate = new BigNumber(1).plus(weeklyRate);
-  const compoundFactor = onePlusRate.exponentiatedBy(totalWeeks);
-  const numerator = compoundFactor.minus(1);
-  const finalAmount = weeklyInvestment.multipliedBy(numerator).dividedBy(weeklyRate);
+
+  let finalAmount: BigNumber;
+
+  if (weeklyRate.isZero()) {
+    // If no interest, just multiply payment by periods
+    finalAmount = weeklyInvestment.multipliedBy(totalWeeks);
+  } else {
+    // Calculate final amount using annuity formula
+    const onePlusRate = new BigNumber(1).plus(weeklyRate);
+    const compoundFactor = onePlusRate.exponentiatedBy(totalWeeks);
+    const numerator = compoundFactor.minus(1);
+    finalAmount = weeklyInvestment.multipliedBy(numerator).dividedBy(weeklyRate);
+  }
   
   // Generate growth data for visualization
   const growthData: InvestmentGrowthPoint[] = [];
   let cumulativeLotteryCost = new BigNumber(0);
   let cumulativeInvestment = new BigNumber(0);
-  
+  const onePlusRate = weeklyRate.isZero() ? new BigNumber(1) : new BigNumber(1).plus(weeklyRate);
+
   for (let year = 1; year <= years; year++) {
     const weeksInYear = year * 52;
     cumulativeLotteryCost = cumulativeLotteryCost.plus(weeklyInvestment.multipliedBy(52));
-    
+
     // Calculate investment value at this year
-    const yearCompoundFactor = onePlusRate.exponentiatedBy(weeksInYear);
-    const yearNumerator = yearCompoundFactor.minus(1);
-    cumulativeInvestment = weeklyInvestment.multipliedBy(yearNumerator).dividedBy(weeklyRate);
-    
+    if (weeklyRate.isZero()) {
+      cumulativeInvestment = weeklyInvestment.multipliedBy(weeksInYear);
+    } else {
+      const yearCompoundFactor = onePlusRate.exponentiatedBy(weeksInYear);
+      const yearNumerator = yearCompoundFactor.minus(1);
+      cumulativeInvestment = weeklyInvestment.multipliedBy(yearNumerator).dividedBy(weeklyRate);
+    }
+
     growthData.push({
       year,
       lotteryCost: cumulativeLotteryCost.toNumber(),
