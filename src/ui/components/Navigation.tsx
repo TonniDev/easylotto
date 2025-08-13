@@ -25,6 +25,7 @@ const navigationItems = [
   { name: "Winners", href: "/winners-per-state" },
   { name: "Risk Calculator", href: "/education/multi-game-calculator" },
   { name: "Myth Buster", href: "/education/common-misconceptions" },
+  { name: "Risk Dashboard", href: "/risk-assessment" },
 ];
 
 export function Navigation() {
