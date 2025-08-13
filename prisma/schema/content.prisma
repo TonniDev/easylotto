@@ -1,0 +1,125 @@
+// Content Management System models for educational articles
+
+model articles {
+  id              String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title           String   @db.VarChar(255)
+  slug            String   @unique @db.VarChar(255)
+  excerpt         String?  @db.Text
+  content         String   @db.Text
+  featured_image  String?  @db.VarChar(500)
+  status          String   @default("draft") @db.VarChar(20) // 'draft', 'published', 'archived'
+  category_id     String?  @db.Uuid
+  author_id       String   @db.Uuid
+  reading_time    Int?     // Estimated reading time in minutes
+  view_count      Int      @default(0)
+  seo_title       String?  @db.VarChar(255)
+  seo_description String?  @db.VarChar(500)
+  seo_keywords    String?  @db.Text
+  published_at    DateTime?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  // Relations
+  category        article_categories? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  author          users               @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  tags            article_tags[]
+  views           article_views[]
+  
+  @@index([status])
+  @@index([category_id])
+  @@index([author_id])
+  @@index([published_at])
+  @@index([slug])
+  @@map("articles")
+}
+
+model article_categories {
+  id          String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String   @unique @db.VarChar(100)
+  slug        String   @unique @db.VarChar(100)
+  description String?  @db.Text
+  color       String?  @db.VarChar(7) // Hex color code
+  icon        String?  @db.VarChar(50) // Icon name or emoji
+  sort_order  Int      @default(0)
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  // Relations
+  articles    articles[]
+  
+  @@index([is_active])
+  @@index([sort_order])
+  @@map("article_categories")
+}
+
+model article_tags {
+  id         String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  article_id String   @db.Uuid
+  tag_name   String   @db.VarChar(50)
+  created_at DateTime @default(now())
+  
+  // Relations
+  article    articles @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  
+  @@unique([article_id, tag_name])
+  @@index([tag_name])
+  @@map("article_tags")
+}
+
+model article_views {
+  id         String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  article_id String   @db.Uuid
+  user_id    String?  @db.Uuid
+  ip_address String?  @db.VarChar(45)
+  user_agent String?  @db.Text
+  viewed_at  DateTime @default(now())
+  
+  // Relations
+  article    articles @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  user       users?   @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  
+  @@index([article_id])
+  @@index([user_id])
+  @@index([viewed_at])
+  @@map("article_views")
+}
+
+model content_blocks {
+  id          String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String   @unique @db.VarChar(100)
+  title       String?  @db.VarChar(255)
+  content     String   @db.Text
+  block_type  String   @db.VarChar(50) // 'hero', 'feature', 'testimonial', 'faq', etc.
+  is_active   Boolean  @default(true)
+  sort_order  Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  @@index([block_type])
+  @@index([is_active])
+  @@index([sort_order])
+  @@map("content_blocks")
+}
+
+model educational_resources {
+  id              String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  resource_type   String   @db.VarChar(50) // 'calculator', 'guide', 'video', 'infographic'
+  resource_url    String?  @db.VarChar(500)
+  thumbnail_url   String?  @db.VarChar(500)
+  difficulty_level String  @db.VarChar(20) // 'beginner', 'intermediate', 'advanced'
+  estimated_time  Int?     // Time in minutes
+  is_featured     Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  sort_order      Int      @default(0)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  @@index([resource_type])
+  @@index([difficulty_level])
+  @@index([is_featured])
+  @@index([is_active])
+  @@map("educational_resources")
+}

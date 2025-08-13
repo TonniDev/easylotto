@@ -13,6 +13,8 @@ model users {
   spending_insights     spending_insights[]
   investment_scenarios  investment_scenarios[]
   spending_reports      spending_reports[]
+  articles              articles[]
+  article_views         article_views[]
 
   @@index([email])
   @@map("users")
