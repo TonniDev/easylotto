@@ -1,5 +1,9 @@
 .PHONY: help
 
+# Load .env.local via the npm dotenv-cli (the global `dotenv` may be a different tool, e.g. python-dotenv)
+DOTENV = npx -y dotenv-cli -e .env.local --
+TSX = npx -y tsx
+
 # Main docker compose script
 up:
 		docker-compose --env-file .env.local up -d
@@ -20,16 +24,16 @@ down:
 		docker-compose down
 
 migrations:
-		dotenv -e .env.local pnpm migration:create:dev
+		$(DOTENV) pnpm migration:create:dev
 
 migrate:
-		dotenv -e .env.local pnpm migrate:dev
+		$(DOTENV) pnpm migrate:dev
 
 update:
-		dotenv -e .env.local npx tsx src/lib/utils/cron/update.ts
+		$(DOTENV) $(TSX) src/lib/utils/cron/update.ts
 
 rollback:
-		dotenv -f .env.local pnpm migrate:reset:dev
+		$(DOTENV) pnpm migrate:reset:dev
 
 status:
 		docker-compose ps

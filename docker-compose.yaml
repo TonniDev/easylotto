@@ -1,7 +1,7 @@
 services:
   db:
-    image: postgres
-    restart: always
+    image: postgres:17
+    restart: no
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: default
@@ -9,11 +9,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - 5436:5432
  
   adminer:
     image: adminer
-    restart: always
+    restart: no
     ports:
       - 8080:8080
  
